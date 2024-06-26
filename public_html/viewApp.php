@@ -10,11 +10,11 @@ if(!$num){
     $report->mysql->table("3report")->truncate();
     $_SESSION['start'] = time();
 }
+
 if(empty($_SESSION['start']))
     $_SESSION['start'] = time();
-
 $sql= [];
-$app= $report->getApp($sql,"object",$num);
+$app= $report->getApp($sql,"object",$num-1);
 if($app){
     $report->getOrderDate($sql['orderDate'],$report->app->{"Приказ"});
     $report->getAppStatus($sql['appStatus'],$report->app->{"Статус"});
@@ -25,9 +25,9 @@ if($app){
     $report->getTrials($sql);
     $report->getAchivements($sql);
     $report->getSpec($sql);
-//    echo "<pre>";
-//    print_r($sql);
-//    die();
+    echo "<pre>";
+    print_r($sql);
+    die();
     echo "<pre>";
     print_r($sql['appID']);
     $report->mysql->table("3report")->insert($sql);
@@ -35,8 +35,8 @@ if($app){
 }
 ?>
 <hr>
-start:&#9;<?php echo date("H:i:s",$_SESSION['start'])?><br>
-end:&#9;<?php echo date("H:i:s")?>
+start: <?php echo date("H:i:s",$_SESSION['start'])?><br>
+end: <?php echo date("H:i:s")?>
 
 
 

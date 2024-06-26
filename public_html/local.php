@@ -7,11 +7,13 @@ $report= new report();
 session_start();
 $num= $_GET['num']??0;
 if(!$num){
-    $report->mysql->table("3report")->truncate();
+    $report->MariaDB->table("3report")->truncate();
     $_SESSION['start'] = time();
 }
 if(empty($_SESSION['start']))
     $_SESSION['start'] = time();
+if(!$num)
+    $num=20;
 
 $sql= [];
 $app= $report->getApp($sql,"object",$num);
@@ -25,12 +27,9 @@ if($app){
     $report->getTrials($sql);
     $report->getAchivements($sql);
     $report->getSpec($sql);
-//    echo "<pre>";
-//    print_r($sql);
-//    die();
     echo "<pre>";
     print_r($sql['appID']);
-    $report->mysql->table("3report")->insert($sql);
+    $report->MariaDB->table("3report")->insert($sql);
     header("Refresh:0.01; ?num=".$sql['appID']);
 }
 ?>
