@@ -233,9 +233,9 @@ class report{
         $tmp= [
             "specCode"=>$res->{"ОКСО"},
             "specName"=>$res->{"Название_Спец"},
-            "specLevel"=>$res->{"Квалификация"},
-//            "specShape"=>self::getFields("Уровень_образования","Уровень","Код_записи",$res->{'Уровень'}),
-            "specShape"=>self::getFields("Уровень_образования","Название","Код_записи",$res->{'Уровень'}),
+            "specLevel"=>self::getFields("Уровень_образования","Название","Код_записи",$res->{'Уровень'}),
+//            "specLevel"=>self::getFields("Уровень_образования","Уровень","Код_записи",$res->{'Уровень'}),
+            "specShape"=>self::getFields("Тип_Обучения","Название","Код",$res->{"ФормаОбучения"}),
         ];
         $sql= $sql+$tmp;
         return true;
