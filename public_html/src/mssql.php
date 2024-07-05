@@ -106,7 +106,7 @@ class mssql{
     }
 
     public function limit($p,$c){
-        $this->limit = "LIMIT $p, $c";
+        $this->limit = "LIMIT $p $c";
         return $this;
     }
 

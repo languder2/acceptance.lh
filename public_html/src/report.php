@@ -94,12 +94,15 @@ class report{
         $sql= $tmp->{"ДатаПриказа"};
         return true;
     }
-    public function getFields($table,$select,$where,$op):bool|string{
+    public function getFields($table,$select,$where,$op):bool|string|object{
         if(empty($op)) return false;
         $res= $this->mssql->table($table)->select($select)->where([$where=>$op])->get();
         if($res->numRows()==0) return false;
         $tmp= $this->convert($res->getResult());
-        return $tmp->{$select};
+        if(is_array($select))
+            return $tmp;
+        else
+            return $tmp->{$select};
     }
     public function getUser(&$sql):bool{
         if(empty($sql['uID'])) return false;
@@ -230,11 +233,13 @@ class report{
         $res= $this->mssql->table("Специальности")->where(["Код"=>$sql['specID']])->get();
         if($res->numRows()==0) return false;
         $res= self::convert($res->getResult());
+        $specProfiles= self::getFields("СпециальностиПрофили",["НаправлениеКод","НаправлениеНазвание","Профиль"],"КодСпециальности",$sql['specID']);
         $tmp= [
             "specCode"=>$res->{"ОКСО"},
-            "specName"=>$res->{"Название_Спец"},
+            "specName"=>!empty($specProfiles->{"НаправлениеНазвание"})?$specProfiles->{"НаправлениеНазвание"}:$res->{"Название_Спец"},
+            "specProfile"=>$specProfiles->{"Профиль"}??"",
             "specLevel"=>self::getFields("Уровень_образования","Название","Код_записи",$res->{'Уровень'}),
-//            "specLevel"=>self::getFields("Уровень_образования","Уровень","Код_записи",$res->{'Уровень'}),
+//            "specLevel2"=>self::getFields("Уровень_образования","Уровень","Код_записи",$res->{'Уровень'}),
             "specShape"=>self::getFields("Тип_Обучения","Название","Код",$res->{"ФормаОбучения"}),
         ];
         $sql= $sql+$tmp;

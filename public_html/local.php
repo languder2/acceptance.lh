@@ -14,7 +14,7 @@ if(empty($_SESSION['start']))
     $_SESSION['start'] = time();
 if(!$num)
     $num=20;
-
+$num= 2240;
 $sql= [];
 $app= $report->getApp($sql,"object",$num);
 if($app){
@@ -27,9 +27,8 @@ if($app){
     $report->getTrials($sql);
     $report->getAchivements($sql);
     $report->getSpec($sql);
-    echo "<pre>";
-    print_r($sql['appID']);
     $report->MariaDB->table("3report")->insert($sql);
+    die();
     header("Refresh:0.01; ?num=".$sql['appID']);
 }
 ?>
