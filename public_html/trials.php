@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Style\{Alignment};
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use src\config;
 use src\mysql;
-
+echo date("H:i:s") . "\n";
 
 $config= new config();
 $mysql= new mysql($config->mysql);
@@ -47,8 +47,8 @@ $styles=[
 
 $sheet1 = $spreadsheet->getActiveSheet();
 $sheet1->setTitle("Испытания");
-$sheet1->getStyle("A:Q")->applyFromArray($styles);
-$sheet1->setAutoFilter('A2:Q2');
+$sheet1->getStyle("A:V")->applyFromArray($styles);
+$sheet1->setAutoFilter('A2:V2');
 
 $heads= [
     "A"=>"ЛД",
@@ -175,7 +175,19 @@ foreach ($trials as $spec){
             endforeach;
         endforeach;
 }
+$method= "web";
+
+$file= match ($method){
+    "web"=>"xls/trials.xlsx",
+    "local"=>"D:\OSPanel\home\afc.report\public\xls\trials.xlsx",
+    "host"=>"stats.mgu-mlt.ru/public_html/xls/report.xlsx"
+};
+
+if(file_exists($file))
+    unset($file);
+
 $writer = new Xlsx($spreadsheet);
-$writer->save("xls/trials.xlsx");
+$writer->save($file);
+echo date("H:i:s") . "\n";
 echo "success";
 //echo "<a href='/download.php?xls=trials.xlsx' target='_blank'>Скачать файл испытаний.</a>";

@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Style\{Alignment};
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use src\config;
 use src\mysql;
+echo date("H:i:s") . "\n";
 
 $config= new config();
 $mysql= new mysql($config->mysql);
@@ -279,7 +280,7 @@ $rcs= (object)[  // row counters
     "trial"=>$rs,
     "ach"=>$rs,
 ];
-foreach ($res as $app){
+foreach ($res as $key=>$app){
     foreach ($lettersMax as $letter=>$field)
         $sheet1->setCellValueExplicit($letter.$rcs->app,$app->{$field}??"",\PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
@@ -333,7 +334,7 @@ foreach ($res as $app){
 /** SAVE */
 
 
-$method= "local";
+$method= "web";
 
 $file= match ($method){
     "web"=>"xls/report.xlsx",
@@ -349,5 +350,6 @@ $spreadsheet->setActiveSheetIndex(0);
 $writer = new Xlsx($spreadsheet);
 $writer->save($file);
 
+echo date("H:i:s") . "\n";
 echo "success";
 
