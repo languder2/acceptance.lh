@@ -19,12 +19,6 @@ class config{
             "pass"=>"MGUWebMainPass2024",
             "dbname"=>"ucrtecrt_stats",
         ];
-        $this->MariaDB = (object)[
-            "host"=>"MariaDB-11.2",
-            "user"=>"root",
-            "pass"=>"",
-            "dbname"=>"afc",
-        ];
     }
 
 }

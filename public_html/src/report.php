@@ -16,7 +16,6 @@ class report{
         $this->config= new config();
         $this->mssql= new mssql($this->config->mssql);
         $this->mysql= new mysql($this->config->mysql);
-        $this->MariaDB= new mysql($this->config->MariaDB);
     }
 
     public function test():bool{
@@ -49,7 +48,6 @@ class report{
         $this->app= $this->convert($this->app);
         $sql= [
             "appID"=> $this->app->{"Код_Заявления"},
-            "appDateTime"=> $this->app->{'Дата_Подачи'},
             "appDate"=> $this->app->{'Дата_Подачи'},
             "uID"=> $this->app->{"ID"},
             "appPriority"=> $this->app->{"Приоритет"},
@@ -58,7 +56,7 @@ class report{
             "approval"=> $this->app->{"СогласенНаЗачисление"},
             "appEdForm"=>$this->app->{"КодФормы"},
             "appCourse"=> $this->app->{"Курс"},
-            "specID"=>$this->app->{"Код_Специальности"},
+            "specID"=>$this->app->{"КодПрофиля"},
             "orderNum"=>$this->app->{"Приказ"},
         ];
         return true;
@@ -94,15 +92,12 @@ class report{
         $sql= $tmp->{"ДатаПриказа"};
         return true;
     }
-    public function getFields($table,$select,$where,$op):bool|string|object{
+    public function getFields($table,$select,$where,$op):bool|string{
         if(empty($op)) return false;
         $res= $this->mssql->table($table)->select($select)->where([$where=>$op])->get();
         if($res->numRows()==0) return false;
         $tmp= $this->convert($res->getResult());
-        if(is_array($select))
-            return $tmp;
-        else
-            return $tmp->{$select};
+        return $tmp->{$select};
     }
     public function getUser(&$sql):bool{
         if(empty($sql['uID'])) return false;
@@ -121,9 +116,7 @@ class report{
             13=>"Английский язык",
             14=>"Немецкий язык"
         ];
-        $user= $this->mssql->table("Все_Абитуриенты")->where(["ID"=>$sql['uID']])->get();
-        if($user->numRows()===0) return false;
-        $this->user= $this->convert($user->getResult());
+        $this->user= $this->convert($this->mssql->table("Все_Абитуриенты")->where(["ID"=>$sql['uID']])->get()->getResult());
         $res= [
             "operator"=>self::getFields("Пользователи","ФИО","ID",$this->user->{"КодПользователя"}),
             "surname"=> $this->user->{"Фамилия"},
@@ -230,17 +223,13 @@ class report{
     }
     public function getSpec(&$sql):bool{
         if(empty($sql['uID'])) return false;
-        $res= $this->mssql->table("Специальности")->where(["Код"=>$sql['specID']])->get();
-        if($res->numRows()==0) return false;
-        $res= self::convert($res->getResult());
-        $specProfiles= self::getFields("СпециальностиПрофили",["НаправлениеКод","НаправлениеНазвание","Профиль"],"КодСпециальности",$sql['specID']);
+        $specCode= self::getFields("СпециальностиПрофили","НаправлениеКод","Код",$sql['specID']);
+        $shapeID= self::getFields("Специальности","ФормаОбучения","ОКСО",$specCode);
         $tmp= [
-            "specCode"=>$res->{"ОКСО"},
-            "specName"=>!empty($specProfiles->{"НаправлениеНазвание"})?$specProfiles->{"НаправлениеНазвание"}:$res->{"Название_Спец"},
-            "specProfile"=>$specProfiles->{"Профиль"}??"",
-            "specLevel"=>self::getFields("Уровень_образования","Название","Код_записи",$res->{'Уровень'}),
-//            "specLevel2"=>self::getFields("Уровень_образования","Уровень","Код_записи",$res->{'Уровень'}),
-            "specShape"=>self::getFields("Тип_Обучения","Название","Код",$res->{"ФормаОбучения"}),
+            "specCode"=>$specCode,
+            "specName"=>self::getFields("СпециальностиПрофили","НаправлениеНазвание","Код",$sql['specID']),
+            "specLevel"=>self::getFields("Специальности","Квалификация","ОКСО",$specCode),
+            "specShape"=>self::getFields("Тип_Обучения","Название","Код",$shapeID),
         ];
         $sql= $sql+$tmp;
         return true;

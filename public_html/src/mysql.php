@@ -11,6 +11,7 @@ class mysql{
     private $where;
     private $group;
     private $order;
+    private $limit;
     public function __construct($config){
         $this->conn= mysqli_connect($config->host,$config->user,$config->pass,$config->dbname);
         $this->query("SET NAMES utf8")->get();
@@ -23,12 +24,13 @@ class mysql{
         $this->where= false;
         $this->group= false;
         $this->order= false;
+        $this->limit= false;
         $this->table= $table;
         return $this;
     }
 
     public function query($sql= false){
-        $this->query= "SELECT $this->select FROM $this->table $this->where $this->group $this->order";
+        $this->query= "SELECT $this->select FROM $this->table $this->where $this->group $this->order $this->limit";
         if($sql !== false)
             $this->query= $sql;
         return $this;
@@ -52,6 +54,10 @@ class mysql{
             $arg= implode(",",$arg);
         }
         $this->order= " ORDER BY $arg";
+        return $this;
+    }
+    public function limit($count= 10,$start=0){
+        $this->limit= " LIMIT $start,$count";
         return $this;
     }
     public function where($arg= false){
